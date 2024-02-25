@@ -28,7 +28,7 @@ jobs:
     - name: Install kitware
       run: wget https://apt.kitware.com/kitware-archive.sh && chmod +x kitware-archive.sh && sudo ./kitware-archive.sh
     - name: Install cmake
-      run: apt install cmake
+      run: sudo apt-get install cmake
     - name: Install pip and setuptools
       run: python3 -m pip install -U pip setuptools
     - name: Install poetry
