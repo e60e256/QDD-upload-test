@@ -1,0 +1,71 @@
+name: Publish Python distribution to TestPyPI
+
+on: push
+
+jobs:
+  build:
+    name: Build distribution
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+
+
+    # - name: Install pypa/build
+    #   run: >-
+    #     python3 -m
+    #     pip install
+    #     build
+    #     --user
+    # - name: Build a binary wheel and a source tarball
+    #   run: python3 -m build
+
+    # Build by poetry
+    - name: Install kitware
+      run: wget https://apt.kitware.com/kitware-archive.sh && chmod +x kitware-archive.sh && ./kitware-archive.sh
+    - name: Install cmake
+      run: apt install cmake
+    - name: Install pip and setuptools
+      run: python3 -m pip install -U pip setuptools
+    - name: Install poetry
+      run: python3 -m pip install poetry
+
+    - name: Build command 1
+      run: cmake . -DCMAKE_BUILD_TYPE=Release
+    - name: Build command 2
+      run: cmake --build . -j
+    - name: Build a binary wheel and a source tarball with poetry
+      run: python3 -m poetry build
+
+    - name: Store the distribution packages
+      uses: actions/upload-artifact@v3
+      with:
+        name: python-package-distributions
+        path: dist/
+
+  # publish-to-testpypi:
+  #   name: Publish Python distribution to TestPyPI
+  #   needs:
+  #   - build
+  #   runs-on: ubuntu-latest
+
+  #   environment:
+  #     name: testpypi
+  #     url: https://test.pypi.org/p/fibo-testpypi2
+  #   permissions:
+  #     id-token: write  # IMPORTANT: mandatory for trusted publishing
+
+  #   steps:
+  #   - name: Download all the dists
+  #     uses: actions/download-artifact@v3
+  #     with:
+  #       name: python-package-distributions
+  #       path: dist/
+  #   - name: Publish distribution to TestPyPI
+  #     uses: pypa/gh-action-pypi-publish@release/v1
+  #     with:
+  #       repository-url: https://test.pypi.org/legacy/
